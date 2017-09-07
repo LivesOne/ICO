@@ -20,7 +20,19 @@ contract ThrowableCalc {
     }
 }
 
-contract LVTPreICO is ThrowableCalc {
+contract Owned {
+  address public owner;
+  function Owned() {
+     owner = msg.sender; 
+  }
+
+  modifier onlyowner {
+    require(msg.sender == owner);
+    _;
+  }
+}
+
+contract LVTPreICO is ThrowableCalc, Owned {
 
   event Deposit(address indexed _from, uint256 _eth, uint256 _lvt);
   event TransferEth(uint256 _value);
@@ -97,8 +109,7 @@ contract LVTPreICO is ThrowableCalc {
     Deposit(msg.sender, msg.value, tokens);
   }
 
-  function transferETH() external {
-    require(msg.sender == ethFundAddress);
+  function transferETH() onlyowner {
     uint256 total = this.balance;
     require(total > 0);
     require(ethFundAddress.send(total));
@@ -106,16 +117,14 @@ contract LVTPreICO is ThrowableCalc {
     TransferEth(total);
   }
 
-  function beginNow(uint256 durationBlockNum) external {
-    require(msg.sender == ethFundAddress);
+  function beginNow(uint256 durationBlockNum) onlyowner {
     require(isClosed);
     isClosed = false;
     beginBlockNum = block.number;
     endBlockNum = beginBlockNum + durationBlockNum;
   }
 
-  function closeNow() external {
-    require(msg.sender == ethFundAddress);
+  function closeNow() onlyowner {
     require(!isClosed);
     isClosed = true;
   }
