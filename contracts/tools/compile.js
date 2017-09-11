@@ -6,6 +6,7 @@ var genABI = function(filepath, contract) {
 	                  var compiled = solc.compile(source);
 	            
 	            fs.writeFileSync(filepath+'.abi.json', compiled.contracts[':'+contract].interface);
+	            fs.writeFileSync(filepath+'.bytecode', compiled.contracts[':'+contract].bytecode);
 }
 
 var args = process.argv.slice(2);
